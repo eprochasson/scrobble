@@ -1,9 +1,13 @@
 <template name="board">
     {{#if isGame}}
-
         {{#if isPlaying}}
         <h2>You are in</h2>
+        {{else}}
+            {{unless hasAllPlayer}}
+                <a href="#" class="btn join">Join this game!</a>
+            {{/unless}}
         {{/if}}
+
         <table class="board">
             {{#each rows}}
             <tr>

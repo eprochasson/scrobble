@@ -24,9 +24,21 @@ Template.board.helpers({
         var board = getBoard();
         return board.playerOne === Meteor.userId() || board.playerTwo === Meteor.userId();
     },
+    hasAllPlayer: function(){
+        var board = getBoard();
+        return board.playerOne && board.playerTwo;
+    },
     tile: function(){
         console.log(this);
         return this;
+    }
+});
+
+Template.board.events({
+    'click .join': function(){
+        Meteor.call('joinGame', Session.get('currentGame'), function(err, res){
+            if(err){throw err;}
+        })
     }
 });
 
