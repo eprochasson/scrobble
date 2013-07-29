@@ -1,0 +1,14 @@
+<template name="home">
+    <a href="#" class="btn btn-primary create">Create a new game!</a>
+    <ul>
+    {{#each games}}
+        {{> game}}
+    {{else}}
+        You don't have any active game at the moment.
+    {{/each}}
+    </ul>
+</template>
+
+<template name="game">
+    <li>Game with {{gameWith}}, <a href="{{boardPath _id}}">Click here to see</a></li>
+</template>

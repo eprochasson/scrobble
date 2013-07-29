@@ -1,0 +1,21 @@
+<template name="board">
+    {{#if isGame}}
+
+        {{#if isPlaying}}
+        <h2>You are in</h2>
+        {{/if}}
+        <table class="board">
+            {{#each rows}}
+            <tr>
+                {{#each tile}}
+                    {{> onetile}}
+                {{/each}}
+            </tr>
+            {{/each}}
+        </table>
+    {{/if}}
+</template>
+
+<template name="onetile">
+    <td class="{{class}}">{{content}}</td>
+</template>
