@@ -1,10 +1,12 @@
 @tileDimension : 50px;
 
 table.board{
+  margin: 0 auto;
   tr{
-    height: 50px;
+    height: @tileDimension;
     td{
-      width: 50px;
+      width: @tileDimension;
+      border: 1px solid #fff;
     }
     .mul0{
       background-color: #e3e3e3;
@@ -24,5 +26,32 @@ table.board{
     .mul5{
       background-color: #ff0;
     }
+    .empty{
+      background: #eee;
+    }
+    .hovered{
+      background: #ccc;
+    }
   }
 }
+
+div.banc{
+  margin: 20px auto;
+  height: @tileDimension;
+  width: 500px;
+  border: 1px solid #000;
+  div{
+    height: @tileDimension;
+    border: 2px #fff solid;
+    margin: 2px 0;
+    width: @tileDimension;
+    background: #f9f6a2;
+    text-transform: uppercase;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    cursor: move;
+    float: left;
+  }
+}
+

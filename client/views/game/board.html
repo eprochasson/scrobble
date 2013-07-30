@@ -1,25 +1,43 @@
 <template name="board">
     {{#if isGame}}
+
+
         {{#if isPlaying}}
-        <h2>You are in</h2>
+            <h2>You are in</h2>
         {{else}}
-            {{unless hasAllPlayer}}
+            {{#unless hasAllPlayer}}
                 <a href="#" class="btn join">Join this game!</a>
             {{/unless}}
-        {{/if}}
 
-        <table class="board">
+        {{/if}}
+    <h3>Between {{playerOneName}} and {{playerTwoName}}</h3>
+
+        <table class="board ">
             {{#each rows}}
-            <tr>
+            <tr class="">
                 {{#each tile}}
-                    {{> onetile}}
+                    {{> onesquare}}
                 {{/each}}
             </tr>
             {{/each}}
         </table>
+
+        {{#if isPlaying}}
+        <div class="banc sortable">
+
+            {{#each myTiles}}
+                {{> onetile}}
+            {{/each}}
+        </div>
+        {{/if}}
     {{/if}}
 </template>
 
-<template name="onetile">
+<template name="onesquare">
     <td class="{{class}}">{{content}}</td>
+</template>
+
+
+<template name="onetile">
+    <div data-extraclass="{{class}}" data-letter="{{letter}}" data-value="{{value}}" class="{{class}} draggable">{{letter}} ({{value}})</div>
 </template>

@@ -1,6 +1,7 @@
-var Board = function(board){
+var Board = function(board, bag){
     return {
         board: board,
+        bag: bag,
 
         // Create a game board from a given board.
         makeBoard : function(){
@@ -12,6 +13,7 @@ var Board = function(board){
                 });
                 b.push(thisline);
             });
+            this.board = b;
             return b;
         },
         // Check if that the board is all ok (before committing the modification).
@@ -143,23 +145,55 @@ var Board = function(board){
         // No idea how to do that yet.
         score: function(coords){
             return 0;
+        },
+        // Transform a bag object into an actual set of tiles. Shuffle the tiles.
+        makeBag: function(){
+            if(typeof this.bag == 'object'){
+                var bag = [];
+                _.each(this.bag, function(v,k){
+                    for(var i = 0 ; i < v.quantity ; i++){
+                        bag.push({letter: k, value: v.value});
+                    }
+                });
+                this.bag = bag;
+            }
+            this.bag = _.shuffle(this.bag);
+            return this.bag;
+        },
+        // Pick tiles from the bag, withdraw them from the bag, return the selection.
+        pickTiles: function(quantity){
+            var res = [];
+            if(quantity > this.bag.length){
+                res = this.bag;
+                this.bag = [];
+                return res;
+            }
+            res = this.bag.slice(0, quantity);
+            this.bag = this.bag.slice(quantity);
+            return res;
         }
     };
 };
 
 Meteor.methods({
     createGame: function(){
-        var b = Board(Config.Board);
+        var b = Board(Config.Board, Config.Letters);
+
+        b.makeBag();
+        b.makeBoard();
+
         var doc = {};
-        doc.board = b.makeBoard(); // Initialize the board
-        doc.bag = Config.Letters; // Create the bag of letter to pick from.
+        doc.board = b.board; // Initialize the board
         doc.playerOne = this.userId;
         doc.playerTurn = this.userId;
         doc.spectators = [];
         doc.playerOneScore = 0;
         doc.playerTwoScore = 0;
-        doc.playerOneTiles = [];
-        doc.playerTwoTiles = [];
+        doc.bag = b.bag;
+        doc.playerOneTiles = b.pickTiles(7); // randomly pick tiles for players
+        doc.playerTwoTiles = b.pickTiles(7);
+
+        doc.started = new Date().getTime();
 
         return Games.insert(doc);
     },
@@ -211,19 +245,47 @@ Meteor.methods({
             throw new Meteor.Error(404, "Game Not Found");
         }
 
-        var board = Board(game.board);
+        var board = Board(game.board, game.bag);
         var score = 0;
+
+        if(!(game.playerTurn === this.userId)){
+            throw new Meteor.Error(300, "Forbidden");
+        }
 
         if(board.play(coords)){
             score = board.score(coords);
         }
+        // Play is valid.
+        var playerOneTiles = game.playerOneTiles;
+        var playerTwoTiles = game.playerTwoTiles;
 
-        Games.update(gameId, {$set: {board: board.board}}, function(err, res){
+        var nextPlayer, currentPlayer, bag = game.bag;
+        if(game.playerTurn === game.playerOne){
+            nextPlayer = game.playerTwo;
+            playerOneTiles = board.pickTiles(7-playerOneTiles.length);
+            currentPlayer = 'playerOne';
+        } else {
+            nextPlayer = game.playerOne;
+            playerTwoTiles = board.pickTiles(7-playerTwoTiles.length);
+            currentPlayer = 'playerTwo';
+        }
+
+
+        Games.update(gameId,
+            {
+                $set:
+                    {
+                        board: board.board,
+                        lastplay: new Date().getTime(),
+                        playerTurn: nextPlayer,
+                        playerOneTiles : playerOneTiles,
+                        playerTwoTiles: playerTwoTiles,
+                        bag: board.bag
+                    }
+            }, function(err, res){
             if(err){
                 throw new Meteor.Error(err);
             } else {
-                // pick tiles in the bag
-
                 return {
                     score: score
                 };

@@ -1,3 +1,11 @@
+Meteor.startup(function(){
+    if(Meteor.isClient){
+        Accounts.ui.config({
+            passwordSignupFields: 'USERNAME_AND_EMAIL'
+        })
+    }
+});
+
 Config = {};
 
 // Letters distribution and value.
