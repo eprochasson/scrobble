@@ -294,7 +294,7 @@ var Board = function(board, bag, values){
         inDictionary: function(word){
             console.log('Checking word', word);
             // debug
-            return true;
+//            return true;
             return Boolean(Dictionary.findOne({word: word}));
         },
         // Check that a given tile has a value.
@@ -537,7 +537,7 @@ Meteor.methods({
         console.log(playerOneScore);
 
         // DEBUG:
-        nextPlayer = game.playerOne;
+//        nextPlayer = game.playerOne;
 
         Games.update(gameId,
             {
@@ -617,7 +617,7 @@ Meteor.methods({
         }
 
         // DEBUG:
-        nextPlayer = game.playerOne;
+//        nextPlayer = game.playerOne;
 
         Games.update(gameId,
             {
