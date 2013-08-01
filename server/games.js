@@ -295,7 +295,8 @@ var Board = function(board, bag, values){
             console.log('Checking word', word);
             // debug
 //            return true;
-            return Boolean(Dictionary.findOne({word: word}));
+            var search = new RegExp(word.replace('*','.'));
+            return Boolean(Dictionary.findOne({word: search}));
         },
         // Check that a given tile has a value.
         isEmptyTile: function(x,y){
