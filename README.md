@@ -8,11 +8,11 @@ A simple scrabble-like game implementd with Meteor. Name has to change.
 1. `npm install -g meteorite` (if not already installed)
 2. `mrt`
 
-should do the trick. The first start is quite slow as it needs the dictionary in the database.
+should do the trick. The first start is quite slow as it needs to load the dictionary in the database.
 
 ## Demo
 
-A live demo is available on [http://scrobble.meteor.com]
+A live demo is available on http://scrobble.meteor.com
 
 ## License stuff
 
