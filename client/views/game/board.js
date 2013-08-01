@@ -1,5 +1,5 @@
 var getBoard = function(){
-    return Games.findOne(Session.get('currentGame'));
+    return Session.get('boardReady') && Games.findOne(Session.get('currentGame'));
 };
 
 Template.board.helpers({
@@ -29,21 +29,27 @@ Template.board.helpers({
         return board.playerOne && board.playerTwo;
     },
     tile: function(){
-        console.log(this);
         return this;
+    },
+    myTurn: function(){
+        var board = getBoard();
+        return board.playerTurn === Meteor.userId();
     },
     myTiles: function(){
         var board = getBoard();
+
         if(!board){
             return null;
         }
         if(board.playerOne === Meteor.userId()){
-            return board.playerOneTiles;
+            tiles = board.playerOneTiles;
         } else if(board.playerTwo === Meteor.userId()) {
-            return board.playerTwoTiles;
-        } else {
-            return [];
+            tiles = board.playerTwoTiles;
         }
+        while(tiles.length < 9){
+            tiles.push({ empty : true });
+        }
+        return tiles;
     },
     playerOneName: function(){
         var board = getBoard();
@@ -62,86 +68,114 @@ Template.board.helpers({
         if(!p2){
             return 'No One Yet!'
         }
+    },
+    otherPlayerName: function(){
+        var board = getBoard();
+        if(!board){
+            return '';
+        }
+
+        var user;
+        if(board.playerOne === Meteor.userId()){
+            if(!board.playerTwo){
+                return '';
+            }
+            user = Meteor.users.findOne(board.playerTwo);
+            return user && user.username;
+        } else if(board.playerTwo === Meteor.userId()) {
+            user = Meteor.users.findOne(board.playerOne);
+            return user && user.username;
+        }
+        return '';
     }
+
 });
 
 Template.board.events({
-    'click .join': function(){
+    'click .join': function(e){
+        e.preventDefault();
         Meteor.call('joinGame', Session.get('currentGame'), function(err, res){
             if(err){throw err;}
         })
+    },
+    'click .play': function(e){
+        e.preventDefault();
+        var res = [];
+        // collect all the tiles from the board.
+        _.each($('table.board .playing'), function(tile){
+            console.log(tile);
+            var parent = $(tile).parent();
+            res.push({
+                v: $(tile).data('letter'),
+                x: $(parent).data('x'),
+                y: $(parent).data('y')
+            })
+        });
+        if(_.isEmpty(res)){
+            alert('How about putting some tiles on the board?');
+            return;
+        }
+
+        console.log('sending ', res);
+        Meteor.call('play', res, Session.get('currentGame'), function(err, res){
+            if(err){
+                throw err;
+            } else {
+//                alert('ok');
+            }
+        })
+    },
+    'click .changetiles': function(e){
+        e.preventDefault();
+        Meteor.call('change_tiles', Session.get('currentGame'), function(err, res){
+            if(err){
+                throw err;
+            } else {
+//                alert('ok');
+            }
+        })
+    },
+    'click .skip': function(e){
+        e.preventDefault();
+        Meteor.call('skip_turn', Session.get('currentGame'), function(err, res){});
     }
 });
 
 Template.board.rendered = function(){
-    var dropped = false;
-    var draggable_sibling;
-    var droppable = $('.droppable');
-    var draggable = $('.draggable');
-    var sortable = $('.sortable');
+    if(Session.get('boardReady')){
+        var setDropOption = function(el, e){
 
-    sortable.sortable({
-        start: function(e, ui){
-            draggable_sibling = $(ui.item).prev();
-            console.log('start', draggable_sibling);
-        },
-        stop: function(e, ui){
-            var item = ui.item;
-            if(dropped){
-                dropped = false;
-                console.log('stop', draggable_sibling);
-                if(draggable_sibling.length == 0){
-                    console.log('adding before');
-                    $('.sortable').prepend(item);
-                } else {
-                    draggable_sibling.after(item);
-                }
-                console.log(item);
+            console.log('hello', el, e);
+            while(el && el.nodeName !== 'TABLE'){
+                el = el.parentNode;
             }
-        }
-    });
-    sortable.disableSelection();
-    droppable.droppable({
-        accept: '.draggable',
-        hoverClass: 'hovered',
-        drop: function(e, ui){
+            if($(el).hasClass('banc')){
+                rd.drop_option = 'switching';
+            } else if($(el).hasClass('board')){
+                console.log('single');
+                rd.drop_option = 'single';
+            }
+        };
+        rd = REDIPS.drag;
+        rd.init();
+        rd.drop_option = 'single';
 
-            console.log('dropped');
-            dropped = true;
-//            var item = ui.draggable;
-//
-//            console.log(item);
-//
-//            item.draggable({ revert: false });
-//            item.position( { of: $(this), my: 'left top', at: 'left top' } );
-//            console.log('drop');
-        }
+        rd.myhandler_moved = function(){
+            setDropOption(rd.obj);
+        };
 
-//        drop: function(e, ui){
-//            var item = $(ui.draggable);
-//            if(!($(this).hasClass('busy'))){
-//                dropped = true;
-//                $(e.target).addClass('dropped');
-//                console.log('drop', ui);
-//                item.addClass('onboard');
-//                var newItem = Template.onetile({letter: item.data('letter'), class: item.data('extraclass'), value: item.data('value')});
-//                $('body').append(newItem).draggable({
-//                    connectToSortable: '.sortable'
-//                }).position( { of: $(this), my: 'left top', at: 'left top' } );
-//                item.remove();
-//
-//                $(this).addClass('busy', true);
-//            }
-//        },
-//        out: function(e,ui){
-//            var item = $(ui.draggable);
-//            if(item.hasClass('onboard')){
-//                $(this).data('busy', false);
-//                console.log('out');
-//                item.draggable('option','connectToSortable', sortable);
-//            }
-//        }
-    });
+        // Also need to tag all square on the board.
+        var x = 0, y = 0;
+        _.each($('table.board').find('tr'), function(tr){
+            _.each($(tr).find('td'), function(td){
+                $(td).data("x", x);
+                $(td).data("y", y);
+                x += 1;
+            });
+            x = 0;
+            y += 1;
+        })
+    }
 };
 
 Template.onesquare.helpers({
@@ -153,6 +187,11 @@ Template.onesquare.helpers({
             return 'droppable mul'+this.mul;
         }
         return 'droppable empty';
+    },
+    letterValue: function(){
+        if(this.content){
+            return Config.Letters[this.content].value;
+        }
     }
 });
 

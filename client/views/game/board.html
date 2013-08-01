@@ -11,7 +11,7 @@
 
         {{/if}}
     <h3>Between {{playerOneName}} and {{playerTwoName}}</h3>
-
+        <div id="drag">
         <table class="board ">
             {{#each rows}}
             <tr class="">
@@ -23,21 +23,49 @@
         </table>
 
         {{#if isPlaying}}
-        <div class="banc sortable">
+        <table class="banc">
+            <tr>
 
             {{#each myTiles}}
                 {{> onetile}}
             {{/each}}
-        </div>
+            </tr>
+        </table>
+
+
+            <div class="control hero-unit">
+            {{#if myTurn}}
+                <h3>You are playing!</h3>
+                <p>Your score: <strong>{{myScore}}</strong>{{#if otherPlayerName}}, {{otherPlayerName}}' score: <strong>{{otherPlayerScore}}</strong>{{/if}}</p>
+                <a href="#" class="btn btn-primary play">Play</a>
+                <a href="#" class="btn skip">Skip turn</a>
+                <a href="#" class="btn changetiles">Change your tiles</a>
+            {{else}}
+                <h3>{{otherPlayerName}} is playing</h3>
+                <p>Your score: <strong>{{myScore}}</strong></p>
+            {{/if}}
+            </div>
         {{/if}}
+        </div>
     {{/if}}
 </template>
 
 <template name="onesquare">
-    <td class="{{class}}">{{content}}</td>
+    {{#if content}}
+    <td class="{{class}} mark">
+        <div class="tile dropped mark single"><div class="draginner"><span class="letter">{{content}}</span> <span class="value">{{letterValue}}</span></div></div>
+    </td>
+    {{else}}
+    <td class="{{class}} single">
+    </td>
+    {{/if}}
 </template>
 
 
 <template name="onetile">
-    <div data-extraclass="{{class}}" data-letter="{{letter}}" data-value="{{value}}" class="{{class}} draggable">{{letter}} ({{value}})</div>
+    <td>
+        {{#unless this.empty}}
+        <div class="tile drag playing" data-letter="{{letter}}"><div class="draginner"><span class="letter">{{letter}}</span> <span class="value">{{value}}</span></div></div>
+        {{/unless}}
+    </td>
 </template>

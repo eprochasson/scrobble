@@ -7,6 +7,10 @@ Meteor.Router.add({
             } else{
                 return 'front'
             }
+        },
+        and: function(){
+            Session.set('boardReady', false);
+            Session.set('currentGame', null);
         }
     },
     '/game/:_id': {
