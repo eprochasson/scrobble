@@ -1,9 +1,9 @@
-= Scrobble
-== A Scrabble-like game with Meteor
+# Scrobble
+## A Scrabble-like game with Meteor
 
 A simple scrabble-like game implementd with Meteor. Name has to change.
 
-== How to run
+## How to run
 
 1. `npm install -g meteorite` (if not already installed)
 2. `mrt`
