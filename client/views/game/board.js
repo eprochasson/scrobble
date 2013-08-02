@@ -6,6 +6,23 @@ Template.board.helpers({
     isGame: function(){
         return getBoard();
     },
+    gameId: function(){
+        var board = getBoard();
+        if(board){
+            return board._id;
+        } else {
+            return '';
+        }
+    },
+    thisUrl: function(){
+
+        var board = getBoard();
+        if(board){
+            return Meteor.absoluteUrl(Meteor.Router.boardPath(board._id).slice(1)); // remove the first /
+        } else {
+            return '';
+        }
+    },
     rows: function(){
         var board = getBoard();
         return board.board;

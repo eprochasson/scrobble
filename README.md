@@ -14,6 +14,10 @@ should do the trick. The first start is quite slow as it needs to load the dicti
 
 A live demo is available on http://scrobble.meteor.com
 
+## Known Bugs
+
+Some invalid move are still possible, I need to fix that. The trivial cases should be covered. Turns out the logic of scrabble is slightly more complicated than I expected, the initial design was not really fit for it, the end result could be much cleaner.
+
 ## License stuff
 
 This project is licensed with the MIT license.

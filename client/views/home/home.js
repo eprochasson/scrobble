@@ -27,7 +27,7 @@ Template.game.helpers({
             if(game.playerTwo){
                 otherPlayer = Meteor.users.findOne(game.playerTwo);
             } else {
-                return "No one yet";
+                return "";
             }
         } else {
             if(game.playerOne){
