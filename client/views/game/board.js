@@ -20,6 +20,15 @@ Template.board.helpers({
         }
         return -1;
     },
+    currentPlayers: function(){
+        var board = getBoard();
+        if(!board){
+            return '';
+        } else {
+            Session.set('currentPlayers', [board.playerOne, board.playerTwo]);
+            return '';
+        }
+    },
     isPlaying: function(){
         var board = getBoard();
         return board.playerOne === Meteor.userId() || board.playerTwo === Meteor.userId();
@@ -46,6 +55,9 @@ Template.board.helpers({
         } else if(board.playerTwo === Meteor.userId()) {
             tiles = board.playerTwoTiles;
         }
+        if(!tiles){
+            return null;
+        }
         while(tiles.length < 9){
             tiles.push({ empty : true });
         }
@@ -54,20 +66,24 @@ Template.board.helpers({
     playerOneName: function(){
         var board = getBoard();
         if(!board){
-            return;
+            return null;
         }
         var p1 = Meteor.users.findOne(board.playerOne);
+        if(!p1){
+            return null;
+        }
         return p1.username;
     },
     playerTwoName: function(){
         var board = getBoard();
         if(!board){
-            return;
+            return null;
         }
         var p2 = Meteor.users.findOne(board.playerTwo);
         if(!p2){
             return 'No One Yet!'
         }
+        return p2.username;
     },
     otherPlayerName: function(){
         var board = getBoard();
@@ -96,6 +112,7 @@ Template.board.events({
         e.preventDefault();
         Meteor.call('joinGame', Session.get('currentGame'), function(err, res){
             if(err){throw err;}
+            Session.set('playerStatusChange', Math.random(0, 100)); // just trigger a refresh of the publication to get the extra fields.
         })
     },
     'click .play': function(e){
@@ -145,7 +162,6 @@ Template.board.rendered = function(){
     if(Session.get('boardReady')){
         var setDropOption = function(el, e){
 
-            console.log('hello', el, e);
             while(el && el.nodeName !== 'TABLE'){
                 el = el.parentNode;
             }

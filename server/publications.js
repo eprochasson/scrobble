@@ -19,6 +19,22 @@ Meteor.publish('myGames', function(){
     });
 });
 
+Meteor.publish('currentPlayers', function(users){
+    if(!users || !(typeof users === 'object') || _.isEmpty(users)){
+        return null;
+    }
+    if(!this.userId){
+        return null;
+    }
+    var q = [];
+    _.each(users, function(u){
+        if(u){
+            q.push(u);
+        }
+    });
+    return Meteor.users.find({_id: {$in:q}}, {fields: {username: 1}});
+});
+
 Meteor.publish('currentGame', function(gameId){
     if(!gameId){
         return null;
@@ -46,21 +62,6 @@ Meteor.publish('currentGame', function(gameId){
     } else if (game.playerTwo === this.userId){
         fields.playerTwoTiles = 1;
     }
-
-    Meteor.publishWithRelations({
-        handle: this,
-        collection: Games,
-        filter: {_id: gameId},
-        options: {fields: fields},
-        mappings: [{
-            collection: Meteor.users,
-            key: 'playerOne',
-            options: {fields: {username: 1}}
-        },{
-            collection: Meteor.users,
-            key: 'playerTwo',
-            options: {fields: {username: 1}}
-        }]
-    });
+    return Games.find(gameId, {fields: fields});
 
 });

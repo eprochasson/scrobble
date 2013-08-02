@@ -35,6 +35,7 @@ var Board = function(board, bag, values){
                 return false
             }
 
+
             var nb_tiles = 0; // just save the number of tiles use for the connectivity search algorithm. Bit dirty but hey.
             for(var y = 0 ; y < this.boardDimension() ; y++){
                 for(var x = 0 ; x < this.boardDimension() ; x++){
@@ -51,6 +52,11 @@ var Board = function(board, bag, values){
                         }
                     }
                 }
+            }
+
+            if(nb_tiles < 2){
+                console.log('not enough tiles');
+                return false;
             }
 
             // Make sure the board is a connected graph.
@@ -79,7 +85,6 @@ var Board = function(board, bag, values){
             while(!toparse.length == 0){
                 current = toparse.pop();
                 if(!_.contains(through, current[0]+';'+current[1])){
-                    console.log('parsing', current);
                     through.push(current[0]+';'+current[1]);
                     neighbours = this._neighbours(current[0], current[1]);
                     _.each(neighbours, function(n){
@@ -221,10 +226,8 @@ var Board = function(board, bag, values){
             }
             if(word.length > 1 && this.inDictionary(word)){
                 if(scores){
-                    console.log('score', score*multiplier);
                     return score * multiplier;
                 } else {
-                    console.log('score: 0');
                     return 0;
                 }
             } else {
@@ -245,46 +248,37 @@ var Board = function(board, bag, values){
                     switch(tile.mul){
                         case 0: // normal letter
                             score += this.values[tile.content].value;
-                            console.log('score: normal tile',this.values[tile.content].value);
                             break;
                         case 1: // letter double
                             score += 2*this.values[tile.content].value;
-                            console.log('score: letter double',this.values[tile.content].value);
                             break;
                         case 2: // letter triple
                             score += 3*this.values[tile.content].value;
-                            console.log('score: letter triple',this.values[tile.content].value);
                             break;
                         case 3: // word double
                             multiplier += 1;
                             score += this.values[tile.content].value;
-                            console.log('score: word double',this.values[tile.content].value);
                             break;
                         case 4:  // word triple
                             multiplier += 2;
                             score += this.values[tile.content].value;
-                            console.log('score: word tripler',this.values[tile.content].value);
                             break;
                         case 5 : //word start
                             multiplier += 1;
                             score += this.values[tile.content].value;
-                            console.log('score: start case',this.values[tile.content].value);
                             break;
                         default:
                     }
                 } else {
                     score += this.values[tile.content].value;
-                    console.log('score: normal old tile',this.values[tile.content].value);
                 }
                 x += 1;
             }
 
             if(word.length > 1 && this.inDictionary(word)){
                 if(scores){
-                    console.log('score', score*multiplier);
                     return score * multiplier;
                 } else {
-                    console.log('score: 0');
                     return 0;
                 }
             } else {
@@ -292,16 +286,14 @@ var Board = function(board, bag, values){
             }
         },
         inDictionary: function(word){
-            console.log('Checking word', word);
             // debug
 //            return true;
-            var search = new RegExp(word.replace('*','.'));
+            var search = new RegExp('^'+word.replace('*','.')+'$');
             return Boolean(Dictionary.findOne({word: search}));
         },
         // Check that a given tile has a value.
         isEmptyTile: function(x,y){
             return !this.board[y] || !this.board[y][x] || this.board[y][x].content == "";
-
         },
         // Return current tile value.
         tileValue: function(x,y){
@@ -518,12 +510,10 @@ Meteor.methods({
             throw new Meteor.Error(400, "Invalid Move");
         }
 
-        console.log('player scored ',score);
 
         // Play is valid.
         var nextPlayer, currentPlayer, bag = game.bag;
         if(game.playerTurn === game.playerOne){
-
             playerOneTiles = board.removePlayerTiles(coords, playerOneTiles);
             playerOneTiles = playerOneTiles.concat(board.pickTiles(7-playerOneTiles.length));
             playerOneScore += score;
@@ -532,10 +522,8 @@ Meteor.methods({
             playerTwoTiles = board.removePlayerTiles(coords,playerTwoTiles);
             playerTwoTiles = playerTwoTiles.concat(board.pickTiles(7-playerTwoTiles.length));
             playerTwoScore += score;
-            nextPlayer = game.PlayerOne;
+            nextPlayer = game.playerOne;
         }
-
-        console.log(playerOneScore);
 
         // DEBUG:
 //        nextPlayer = game.playerOne;

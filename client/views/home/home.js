@@ -23,9 +23,17 @@ Template.game.helpers({
             return 'Error';
         }
         if(game.playerOne === Meteor.userId()){
-            return game.playerTwo;
+            if(game.playerTwo){
+                return game.playerTwo.username;
+            } else {
+                return "No one yet";
+            }
         } else {
-            return game.playerOne;
+            if(game.playerOne){
+                return game.playerOne.username;
+            } else {
+                return "";
+            }
         }
     }
 });
