@@ -22,18 +22,24 @@ Template.game.helpers({
         if(!game){
             return 'Error';
         }
+        var otherPlayer;
         if(game.playerOne === Meteor.userId()){
             if(game.playerTwo){
-                return game.playerTwo.username;
+                otherPlayer = Meteor.users.findOne(game.playerTwo);
             } else {
                 return "No one yet";
             }
         } else {
             if(game.playerOne){
-                return game.playerOne.username;
+                otherPlayer = Meteor.users.findOne(game.playerOne);
             } else {
                 return "";
             }
+        }
+        if(otherPlayer){
+            return otherPlayer.username;
+        } else {
+            return '';
         }
     }
 });

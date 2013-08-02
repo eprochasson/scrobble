@@ -38,13 +38,13 @@
             <div class="control hero-unit">
             {{#if myTurn}}
                 <h3>You are playing!</h3>
-                <p>Your score: <strong>{{myScore}}</strong>{{#if otherPlayerName}}, {{otherPlayerName}}' score: <strong>{{otherPlayerScore}}</strong>{{/if}}</p>
+                <p>Your score: <strong>{{myScore}}</strong>{{#if otherPlayerName}}, {{otherPlayerName}} score: <strong>{{otherPlayerScore}}</strong>{{/if}}</p>
                 <a href="#" class="btn btn-primary play">Play</a>
                 <a href="#" class="btn skip">Skip turn</a>
                 <a href="#" class="btn changetiles">Change your tiles</a>
             {{else}}
                 <h3>{{otherPlayerName}} is playing</h3>
-                <p>Your score: <strong>{{myScore}}</strong></p>
+                <p>Your score: <strong>{{myScore}}</strong>{{#if otherPlayerName}}, {{otherPlayerName}} score: <strong>{{otherPlayerScore}}</strong>{{/if}}</p>
             {{/if}}
             </div>
         {{/if}}

@@ -20,6 +20,16 @@ Template.board.helpers({
         }
         return -1;
     },
+    otherPlayerScore: function(){
+        var board = getBoard();
+        if(board.playerOne === Meteor.userId()){
+            return board.playerTwoScore || 0;
+        }
+        if(board.playerTwo === Meteor.userId()){
+            return board.playerOneScore || 0;
+        }
+        return 0;
+    },
     currentPlayers: function(){
         var board = getBoard();
         if(!board){
