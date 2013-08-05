@@ -333,7 +333,18 @@ var Board = function(board, bag, values){
 
             return this.checkBoard(true);
         },
-        // just checked that the tiles played are on one line or one column.
+        // just checked that the tiles played are on one line or one column. Also check there is no gap in a player move.
+        // not the cleanest algorithm ever, but the invalid move here is a bit twisted.
+        // Want a diagram? Here you go. +: tiles played, X: tiles on the board.
+        /*
+            0123456789 <- the coords.
+               X
+              +X++  +X   <- not valid, though all tiles are on one line. y = 1.
+               X     X
+            XXXXXXXXXX
+               X
+         */
+
         _checkTilesPlayedDirection : function(coords){
             if(!coords || !(typeof coords == 'object') || !coords[0]){
                 return false;
@@ -341,22 +352,55 @@ var Board = function(board, bag, values){
             if(!coords[1]){
                 return true;
             }
-            var x, y, x2, y2, direction, valid;
+            var x, y, x2, y2, direction, nodirection;
+            var s = []; // Records all the x (or y) positions of the tiles.
+            var lr; // line or row coordinates.
 
             x = coords[0].x; y = coords[0].y;
             x2 = coords[1].x ; y2 = coords[1].y;
+
             if(x == x2 && y != y2){
-                direction = 'x';
+                direction = 'x'; // going horizontally
+                nodirection = 'y';
+                lr = x;
             } else if(x != x2 && y == y2){
-                direction = 'y';
+                direction = 'y'; // going vertically
+                nodirection = 'x';
+                lr = y;
             } else {
                 return false;
             }
+
+            s.push(coords[0][nodirection]);
+            s.push(coords[1][nodirection]);
+
             for(var i = 2 ; i < coords.length ; i++){
+                s.push(coords[i][nodirection]);
                 if(coords[i-1][direction] != coords[i][direction]){
                     return false;
                 }
             }
+
+            s.sort();
+            // With the example diagram, s contains "2458"
+            // From position 2 to position 8, check that we have something in s OR something on the board.
+            for(var j = s[0] ; j <= s[s.length-1] ; j++){
+                switch(direction){
+                    case 'x':
+                        // either it's a new tile, or it's an existing tile on the board.
+                        if(!(s.indexOf(j) > -1 || !this.isEmptyTile(lr, j))){
+                            return false;
+                        }
+                        break;
+                    case 'y':
+                        if(!(s.indexOf(j) > -1 || !this.isEmptyTile(j, lr))){
+                            return false;
+                        }
+                        break;
+                    default:
+                }
+            }
+
             return true;
         },
         setTileValue: function(x,y,value, isnew){

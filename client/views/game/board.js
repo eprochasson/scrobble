@@ -147,7 +147,6 @@ Template.board.events({
         var res = [];
         // collect all the tiles from the board.
         _.each($('table.board .playing'), function(tile){
-            console.log(tile);
             var parent = $(tile).parent();
             res.push({
                 v: $(tile).data('letter'),
@@ -156,16 +155,13 @@ Template.board.events({
             })
         });
         if(_.isEmpty(res)){
-            alert('How about putting some tiles on the board?');
+            alert('Invalid Move');
             return;
         }
 
-        console.log('sending ', res);
         Meteor.call('play', res, Session.get('currentGame'), function(err, res){
             if(err){
-                throw err;
-            } else {
-//                alert('ok');
+                alert("Invalid Move");
             }
         })
     },
@@ -174,8 +170,6 @@ Template.board.events({
         Meteor.call('change_tiles', Session.get('currentGame'), function(err, res){
             if(err){
                 throw err;
-            } else {
-//                alert('ok');
             }
         })
     },
@@ -195,7 +189,6 @@ Template.board.rendered = function(){
             if($(el).hasClass('banc')){
                 rd.drop_option = 'switching';
             } else if($(el).hasClass('board')){
-                console.log('single');
                 rd.drop_option = 'single';
             }
         };
