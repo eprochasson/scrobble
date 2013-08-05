@@ -487,6 +487,8 @@ Meteor.methods({
             throw new Meteor.Error(300, 'Forbidden');
         }
         var game = Games.findOne(gameId);
+
+        var currentPlayer = game.playerTurn;
         if(!game || !this.userId){
             throw new Meteor.Error(404,'Game Not Found');
         }
@@ -506,7 +508,11 @@ Meteor.methods({
             }
         }
 
-        Games.update(gameId, {$set: {playerTwo : this.userId}}, function(err, res){
+        if(!currentPlayer || currentPlayer != game.playerOne){
+            currentPlayer = this.userId;
+        }
+
+        Games.update(gameId, {$set: {playerTwo : this.userId, playerTurn: currentPlayer}}, function(err, res){
             if(err){
                 throw Meteor.Error(err);
             } else {
