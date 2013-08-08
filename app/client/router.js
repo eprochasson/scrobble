@@ -20,7 +20,31 @@ Meteor.Router.add({
             Session.set('currentGame', id);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
+
+
+
+
+
+
+
 
 Meteor.Router.filters({
     'requireLogin': function(page) {
@@ -33,5 +57,11 @@ Meteor.Router.filters({
         }
     }
 });
+
+
+
+
+
+Meteor.Router.homePath();
 
 Meteor.Router.filter('requireLogin', {except: 'front'});

@@ -5,8 +5,9 @@ A simple scrabble-like game implementd with Meteor. Name has to change.
 
 ## How to run
 
-1. `npm install -g meteorite` (if not already installed)
-2. `mrt`
+1. `cd app`
+2. `npm install -g meteorite` (if not already installed)
+3. `mrt`
 
 should do the trick. The first start is quite slow as it needs to load the dictionary in the database.
 

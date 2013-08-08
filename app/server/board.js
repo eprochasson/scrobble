@@ -5,6 +5,11 @@ Board = function(board, bag, values){
 };
 
 
+
+
+
+
+
 // Create a game board from a given board.
 Board.prototype.makeBoard = function(){
     var b = [], thisline;
